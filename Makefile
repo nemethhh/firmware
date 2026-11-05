@@ -33,7 +33,7 @@ else
 SDCC_BANNER = system
 endif
 # Keep default constants in the fixed HOME code area.
-CC_FLAGS = -mmcs51 -I. -Imachine -Ihttpd -Iuip
+CC_FLAGS = -mmcs51 -I. -Imachine -Ihttpd -Iuip -Ipoe
 MACHINE_CC_FLAGS =
 ASM ?= sdas8051
 AFLAGS= -plosgff
@@ -111,6 +111,35 @@ ifeq ($(CI),1)
 	CC_FLAGS += --Werror
 endif
 
+# NO_POE=1 drops PoE support for boards that have it: no PoE sources and no
+# startup call into the driver.
+ifneq ($(NO_POE),)
+	CC_FLAGS += -DNO_POE
+endif
+POE_SRCS := poe/poe.c
+
+MACHINE_POE_CHIP := $(shell \
+	grep -hE '^[[:space:]]*#[[:space:]]*define[[:space:]]+MACHINE_POE_CHIP([[:space:]]|$$)' \
+		machine/$(MACHINE).h 2>/dev/null | head -n 1 | awk '{ print $$3 }')
+
+POE_FW_DIR := poe/firmware
+ifneq ($(MACHINE_POE_CHIP),)
+ifndef NO_POE
+POE_ENABLED := 1
+POE_STOCK_FW := stock_fw/$(MACHINE).bin
+POE_FW_SRC := $(POE_FW_DIR)/poe_fw_$(MACHINE_POE_CHIP).c
+
+# Driver source list per controller. A value without an entry fails the build
+# rather than silently producing a firmware without PoE support.
+POE_CHIP_SRCS_RTL8238C := poe/rtl8238c.c
+POE_CHIP_SRCS := $(POE_CHIP_SRCS_$(MACHINE_POE_CHIP))
+ifeq ($(POE_CHIP_SRCS),)
+$(error MACHINE_POE_CHIP=$(MACHINE_POE_CHIP) has no driver in poe/)
+endif
+POE_SRCS += $(POE_CHIP_SRCS)
+endif
+endif
+
 ifndef BUILDDIR
 	BUILDDIR = output/$(MACHINE)
 endif
@@ -175,6 +204,8 @@ create_build_dir: $(SDCC)
 	mkdir -p "$(BUILDDIR)/machine"
 	mkdir -p "$(BUILDDIR)/machine/pcb"
 	mkdir -p "$(BUILDDIR)/crypto"
+	mkdir -p "$(BUILDDIR)/poe"
+	mkdir -p "$(BUILDDIR)/poe/firmware"
 
 $(MACHINE_REGISTRY):
 	@echo "ERROR: machine registry is missing (expected $(MACHINE_REGISTRY))." >&2
@@ -256,6 +287,7 @@ SRCS += \
 	uip/uip-fw.c \
 	uip/uip-neighbor.c \
 	uip/uip-split.c
+SRCS += $(POE_SRCS) $(POE_FW_SRC)
 
 OBJS = ${SRCS:%.c=$(BUILDDIR)/%.rel}
 MACHINE_OBJ = $(BUILDDIR)/$(MACHINE_SRC:.c=.rel)
@@ -302,12 +334,29 @@ httpd: html_data.h
 $(SUBDIRS):
 	$(MAKE) -C $@ BUILDDIR=$(BUILDDIR)
 
+# The PSE image is generated from the local, uncommitted vendor image (see
+# stock_fw/README.md). Without it the build stops here with an explanation
+# instead of a missing-target error.
+ifeq ($(POE_ENABLED),1)
+$(POE_STOCK_FW):
+	@echo "ERROR: PoE support for $(MACHINE) needs $(POE_STOCK_FW)." >&2
+	@echo "       Put the vendor firmware there, or build with NO_POE=1." >&2
+	@false
+
+$(POE_FW_SRC): $(POE_STOCK_FW) tools/poe_extract.c | tools
+	@mkdir -p $(dir $@)
+	@echo "Extracting $(MACHINE_POE_CHIP) PSE firmware to $@"
+	tools/$(BUILDDIR)/poe_extract -i $(POE_STOCK_FW) -c $(MACHINE_POE_CHIP) -o $@
+endif
+
 clean: $(SUBDIRSCLEAN)
 	-rm -f html_data.c html_data.h $(VERSION_HEADER) $(HTML_MIN_LIST) $(HTML_MIN_STAMP)
+	-rm -rf $(POE_FW_DIR)
 	-if [ -d $(BUILDDIR) ]; then find $(BUILDDIR) -type f ! -name "*.bin" -delete; fi
 
 distclean: $(SUBDIRSCLEAN)
 	-rm -f html_data.c html_data.h $(VERSION_HEADER) $(HTML_MIN_LIST) $(HTML_MIN_STAMP)
+	-rm -rf $(POE_FW_DIR)
 	-rm -rf $(BUILDDIR)
 	-rm -rf toolchain
 
