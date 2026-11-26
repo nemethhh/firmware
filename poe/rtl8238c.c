@@ -79,6 +79,42 @@ void poe_global_set(uint8_t on) __banked
 
 
 /* place holder function for poe support */
+void poe_get_port(void) __banked
+{
+	poe_st_ok = 0;
+	poe_st_admin = 0;
+	poe_st_on = 0;
+	poe_st_class = 0xff;
+	poe_st_volt = 0;
+	poe_st_mv = 0;
+	poe_st_ma = 0;
+	poe_st_type = 0xff;
+}
+
+
+/* place holder function for poe support */
+uint8_t poe_port_type_set(uint8_t port_num, uint8_t type) __banked
+{
+	(void) port_num;
+	(void) type;
+	return 1;
+}
+
+
+/* place holder function for poe support */
+void poe_port_restart(uint8_t port_num) __banked
+{
+	(void) port_num;
+}
+
+
+/* place holder function for poe support */
+void poe_poll(void) __banked
+{
+}
+
+
+/* place holder function for poe support */
 bool poe_chip_init(void) __banked
 {
 	poe_bus_setup();

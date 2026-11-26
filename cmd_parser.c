@@ -1857,13 +1857,45 @@ void print_sw_version(void) __banked {
 
 
 // POE support
+#ifdef POE_PRESENT
+static __code const char * __code const poe_type_names[] = { "af", "at", "bt", "hipoe" };
+#endif
+
 static void parse_poe(void)
 {
 #ifdef POE_PRESENT
+	static __xdata uint8_t t;
+	static __xdata uint16_t dw;
+
 	if (cmd_words_len < 2)
 		goto err;
 
-	if (cmd_compare(1, "load")) {
+	if (cmd_compare(1, "status")) {
+		for (poe_port_num = 0; poe_port_num < MACHINE_NUM_RJ45; poe_port_num++) {
+			poe_get_port();
+			print_string("port "); itoa(poe_port_num + 1);
+			if (!poe_st_ok) {
+				print_string(": no answer from the PoE controller\n");
+				continue;
+			}
+			print_string(poe_st_admin ? ": admin on, power " : ": admin off, power ");
+			print_string(poe_st_on ? "on, type " : "off, type ");
+			print_string(poe_st_type <= POE_TYPE_HIPOE ? poe_type_names[poe_st_type] : "-");
+			print_string(", class ");
+			if (poe_st_class == 0xff)
+				write_char('-');
+			else
+				itoa(poe_st_class);
+			print_string(", "); itoa(poe_st_volt);
+			print_string(" V, "); itoa_short(poe_st_ma);
+			print_string(" mA, ");
+			dw = (uint32_t)poe_st_mv * poe_st_ma / 100000;	// 0.1 W
+			itoa_short(dw / 10);
+			write_char('.');
+			itoa(dw % 10);
+			print_string(" W\n");
+		}
+	} else if (cmd_compare(1, "load")) {
 		// Re-run the full PoE bring-up - the same sequence the boot runs.
 		poe_bringup();
 	} else if (cmd_compare(1, "port")) {
@@ -1875,6 +1907,26 @@ static void parse_poe(void)
 		} else {
 			goto err;
 		}
+	} else if (cmd_compare(1, "type")) {
+		// `poe type <1-n> <af|at|bt|hipoe>`
+		if (cmd_words_len != 4 || !atoi_byte(cmd_words_b[2])
+		    || atoi_results_u8 < 1 || atoi_results_u8 > MACHINE_NUM_RJ45)
+			goto err;
+		for (t = 0; t <= POE_TYPE_HIPOE; t++)
+			if (cmd_compare(3, poe_type_names[t]))
+				break;
+		if (t > POE_TYPE_HIPOE)
+			goto err;
+		if (poe_port_type_set(atoi_results_u8 - 1, t)) {
+			cmd_error("type not allowed on this port\n");
+			return;
+		}
+	} else if (cmd_compare(1, "restart")) {
+		// Power-cycle one port: `poe restart <1-n>`.
+		if (cmd_words_len != 3 || !atoi_byte(cmd_words_b[2])
+		    || atoi_results_u8 < 1 || atoi_results_u8 > MACHINE_NUM_RJ45)
+			goto err;
+		poe_port_restart(atoi_results_u8 - 1);
 	} else if (cmd_compare(1, "global")) {
 		// Enable/disable ALL ports at once: `poe global <on|off>`.
 		if (!cmd_compare(2, "on") && !cmd_compare(2, "off"))
@@ -1886,7 +1938,7 @@ static void parse_poe(void)
 	return;
 
 err:
-	cmd_error("poe load|port <n> <on|off>|global <on|off>\n");
+	cmd_error("poe status|load|port <n> <on|off>|type <n> <af|at|bt|hipoe>|restart <n>|global <on|off>\n");
 #else
 	print_string("PoE not supported on this machine\n");
 #endif /* POE_PRESENT */

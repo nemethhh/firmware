@@ -1186,6 +1186,9 @@ static void handle_tick(void)
 			arp_age_secs = 0;
 			uip_arp_timer();
 		}
+#ifdef POE_PRESENT
+		poe_poll();
+#endif
 
 #ifdef DEBUG
 		print_sfr_data();

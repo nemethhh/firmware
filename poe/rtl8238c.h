@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define POE_CHIP_NAME	"RTL8238C"
+#define POE_MAX_PORTS	8
+
 /* Registers used by the vendor boot loader: 0xec is the control/status
  * register read after a transfer, 0xf4 the window the firmware image is
  * streamed through. */
@@ -24,15 +27,9 @@
  * bank, base address = ports 0-3, base + 1 = ports 4-7. */
 #define POE_PORTS_PER_CTRL	4
 
-struct poe_cfg {
-	uint8_t i2c_bus;		// I2C bus, I2CBUS() encoded (SCL/SDA pin)
-	uint8_t i2c_dev_addr_base;	// 7-bit address of the first controller
-};
-
 /* Firmware image generated from the stock firmware by tools/poe_extract and
  * linked into BANK3 together with the driver. */
 extern __code const uint8_t poe_firmware[];
 extern __code const uint16_t poe_firmware_len;
-extern __code const struct poe_cfg poe_cfg;
 
 #endif
