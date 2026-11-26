@@ -38,6 +38,7 @@ void send_stp(void) __banked;
 void send_lldp(void);
 void send_stp_counters(void) __banked;
 void send_vlanlist(void);
+void send_poe(void) __banked;
 
 /*  Convert only the lower nibble to ascii HEX char.
     For convenience the upper nibble is masked out.

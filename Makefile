@@ -290,7 +290,8 @@ SRCS += \
 	httpd/httpd.c \
 	httpd/page_impl.c \
 	httpd/html_out.c \
-	httpd/page_stp.c
+	httpd/page_stp.c \
+	httpd/page_poe.c
 SRCS += \
 	uip/uip.c \
 	uip/uiplib.c \

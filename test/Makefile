@@ -37,7 +37,8 @@ TESTS = $(BUILDDIR)/test_cmd_editor \
         $(BUILDDIR)/test_nic_rx \
         $(BUILDDIR)/test_lacp \
         $(BUILDDIR)/test_igmp \
-        $(BUILDDIR)/test_poe_hs104
+        $(BUILDDIR)/test_poe_hs104 \
+        $(BUILDDIR)/test_page_poe
 
 # The table tests link the register mock and one environment file; stub/
 # stands in for the two headers a firmware build generates.
@@ -99,6 +100,10 @@ $(BUILDDIR)/test_cpu_vlan_full $(BUILDDIR)/test_cpu_vlan_restricted $(BUILDDIR)/
 # Builds poe/hs104.c as is, against fakes of the I2C helpers in poe/poe.c.
 $(BUILDDIR)/test_poe_hs104: CFLAGS += -DMACHINE_CHIPSET=RTL8372 -DMACHINE_POE_CHIP=HS104
 $(BUILDDIR)/test_poe_hs104: test_poe_hs104.c $(SRCROOT)/poe/hs104.c | $(BUILDDIR)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+$(BUILDDIR)/test_page_poe: CFLAGS += -DMACHINE_CHIPSET=RTL8372 -DMACHINE_POE_CHIP=HS104
+$(BUILDDIR)/test_page_poe: test_page_poe.c $(SRCROOT)/httpd/page_poe.c $(SRCROOT)/httpd/html_out.c | $(BUILDDIR)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 run: $(TESTS)

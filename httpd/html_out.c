@@ -59,3 +59,20 @@ void json_add_array_uint_item(uint8_t x) {
         char_to_html(',');
     itoa_html(x);
 }
+
+
+// In the common area: page generators in every bank call it
+void itoa16_html(uint16_t v) /* up to five digits (65535) */
+{
+	uint8_t print_zeros = 0;
+	uint8_t d;
+	d = v / 10000;
+	if (d) { char_to_html('0' + d); print_zeros = 1; }
+	d = (v / 1000) % 10;
+	if (d || print_zeros) { char_to_html('0' + d); print_zeros = 1; }
+	d = (v / 100) % 10;
+	if (d || print_zeros) { char_to_html('0' + d); print_zeros = 1; }
+	d = (v / 10) % 10;
+	if (d || print_zeros) char_to_html('0' + d);
+	char_to_html('0' + (v % 10));
+}

@@ -15,6 +15,27 @@ var LANG = {
         nav_system: "System",
         nav_fw: "Firmware",
         nav_lldp: "LLDP",
+        nav_poe: "PoE",
+        poe_title: "Power over Ethernet",
+        poe_sum: "{chip}: supply {v} V, delivering {w} W",
+        poe_nochip: "{chip}: the PoE controller does not answer",
+        poe_enable: "Enable",
+        poe_state: "Status",
+        poe_type: "Type",
+        poe_class: "Class",
+        poe_volt: "Voltage",
+        poe_cur: "Current",
+        poe_pow: "Power",
+        poe_on: "powered",
+        poe_off: "off",
+        poe_det: "detecting",
+        poe_allon: "All on",
+        poe_alloff: "All off",
+        poe_restart: "Restart",
+        poe_bt_only: "BT and HiPoE only on ports 1-{n} (power supply budget)",
+        poe_ask: "Enable PoE on port {p}?",
+        poe_ask_d: "The port then powers any device that answers PoE detection.",
+        poe_note: "All ports start with PoE on at boot. Save to flash to keep the changes you make here.",
         hdr_dirty: "unsaved changes",
         hdr_dirty_t: "Running config differs from startup config",
         hdr_save: "Save to flash",
@@ -397,6 +418,18 @@ var LANG = {
         nav_mirror: "ミラーリング",
         nav_lag: "LAG",
         nav_eee: "EEE",
+        nav_poe: "PoE",
+        poe_title: "PoE 給電",
+        poe_enable: "有効",
+        poe_state: "状態",
+        poe_class: "クラス",
+        poe_volt: "電圧",
+        poe_cur: "電流",
+        poe_pow: "電力",
+        poe_on: "給電中",
+        poe_off: "オフ",
+        poe_det: "検出中",
+        poe_alloff: "すべてオフ",
         nav_bw: "帯域制限",
         nav_system: "システム",
         nav_fw: "ファームウェア",
@@ -710,6 +743,18 @@ var LANG = {
         nav_system: "系统",
         nav_fw: "固件",
         nav_lldp: "LLDP",
+        nav_poe: "PoE",
+        poe_title: "以太网供电",
+        poe_enable: "启用",
+        poe_state: "状态",
+        poe_class: "等级",
+        poe_volt: "电压",
+        poe_cur: "电流",
+        poe_pow: "功率",
+        poe_on: "供电中",
+        poe_off: "关闭",
+        poe_det: "检测中",
+        poe_alloff: "全部关闭",
         hdr_dirty: "未保存的更改",
         hdr_dirty_t: "运行配置与启动配置不同",
         hdr_save: "保存到 Flash",
@@ -1388,6 +1433,18 @@ var LANG = {
         fw_timeout: "el switch no ha vuelto tras 150 s: comprueba la alimentación / consola serie",
         nav_isolate: "Aislamiento",
         nav_lldp: "LLDP",
+        nav_poe: "PoE",
+        poe_title: "Alimentación por Ethernet",
+        poe_enable: "Activar",
+        poe_state: "Estado",
+        poe_class: "Clase",
+        poe_volt: "Tensión",
+        poe_cur: "Corriente",
+        poe_pow: "Potencia",
+        poe_on: "alimentando",
+        poe_off: "apagado",
+        poe_det: "detectando",
+        poe_alloff: "Apagar todo",
         i_temp: "Temperatura",
         lldp_enabled: "LLDP activado",
         lldp_title: "Estado del servicio",
@@ -1483,6 +1540,18 @@ var LANG = {
         nav_system: "Système",
         nav_fw: "Micro logiciel",
         nav_lldp: "Couche de Liaison",
+        nav_poe: "PoE",
+        poe_title: "Alimentation par Ethernet",
+        poe_enable: "Activer",
+        poe_state: "État",
+        poe_class: "Classe",
+        poe_volt: "Tension",
+        poe_cur: "Courant",
+        poe_pow: "Puissance",
+        poe_on: "alimenté",
+        poe_off: "arrêt",
+        poe_det: "détection",
+        poe_alloff: "Tout arrêter",
         hdr_dirty: "Changements non sauvegardés",
         hdr_dirty_t: "La configuration utilisée diffère de celle au démarrage",
         hdr_save: "Sauvegarder en flash",
@@ -1963,6 +2032,18 @@ var LANG = {
         stp_dis_d: "Alle Ports leiten sofort weiter; der Schutz vor Netzwerkschleifen entfällt.",
         stp_cost_err: "Pfadkosten müssen zwischen 0 und 200000000 liegen",
         nav_lldp: "LLDP",
+        nav_poe: "PoE",
+        poe_title: "Power over Ethernet",
+        poe_enable: "Aktiv",
+        poe_state: "Status",
+        poe_class: "Klasse",
+        poe_volt: "Spannung",
+        poe_cur: "Strom",
+        poe_pow: "Leistung",
+        poe_on: "versorgt",
+        poe_off: "aus",
+        poe_det: "Erkennung",
+        poe_alloff: "Alle aus",
         lldp_enabled: "LLDP aktiv",
         lldp_title: "Dienststatus",
         lldp_portname: "Name",
@@ -2395,6 +2476,7 @@ var CONF_CMDS = [
     /^eee\s+(on|off)(\s+\d+)?(\s+(100m|1g|2g5))?$/,
     /^mirror(\s+\d+)(\s+\d+[tr]?)+$/, /^mirror\s+off$/,
     /^lag\s+[1-4](\s+\d+)+$/, /^lag\s+[1-4]\s+d$/,
+    /^poe\s+port\s+\d{1,2}\s+(on|off)$/, /^poe\s+global\s+(on|off)$/, /^poe\s+type\s+\d{1,2}\s+(af|at|bt|hipoe)$/,
     /^lag\s+[1-4]\s+lacp(\s+\d+)+$/,
     /^lag\s+[1-4]\s+lacp\s+off$/,
     /^laghash\s+[1-4](\s+\w+)+$/,
@@ -2567,6 +2649,10 @@ var TABS = [{
         icon: "M11 12a1 1 0 002 0 1 1 0 00-2 0M8.5 8.5a5 5 0 000 7M15.5 8.5a5 5 0 010 7M5.6 5.6a9 9 0 000 12.8M18.4 5.6a9 9 0 010 12.8"
     },
     {
+        id: "poe",
+        icon: "M9 2v6M15 2v6M6 8h12v3a6 6 0 01-12 0zM12 17v5"
+    },
+    {
         id: "eee",
         icon: "M13 2L4 14h6l-1 8 9-12h-6z"
     },
@@ -2703,6 +2789,32 @@ function pollStatus() {
         updateStrip();
         var hk = tabHooks[curTab];
         if (hk && hk.status) hk.status();
+        poeStatus();
+    });
+}
+
+/* Watts per powered PoE port for the strip and the dashboard, every other
+ * status poll; S.poeHas false once /poe.json is found missing */
+function poeStatus() {
+    if (S.poeHas === false || (S.poeTick = (S.poeTick || 0) + 1) % 2 !== 1) return;
+    getJSON("/poe.json").then(function(d) {
+        S.poeHas = true;
+        poeWatts(d);
+        updateStrip();
+        if (curTab === "dash") dashStatus();
+    }).catch(function(e) {
+        if (!S.poeHas && / 404$/.test(e.message)) {
+            S.poeHas = false;
+            $("nv-poe").style.display = "none";
+            if (curTab === "poe") showTab("dash");
+        }
+    });
+}
+
+function poeWatts(d) {
+    S.poe = {};
+    (d.ports || []).forEach(function(p) {
+        if (p.on) S.poe[p.port] = p.mv * p.ma / 1e6;
     });
 }
 var statusPoller = new Poller(pollStatus, 2500);
@@ -2786,6 +2898,7 @@ function updateStrip() {
         el.classList.toggle("dis", !p.enabled);
         var up = p.enabled && p.link != "DOWN";
         el.classList.toggle("up", !!up);
+        el.classList.toggle("poe", !!(S.poe && S.poe[p.port] != null));
         if (up) el.style.setProperty("--pc", "var(" + "--s" + p.link.replace(/\-[HF]D$/,"").replace("2.5G","2G5").toLowerCase() + ")");
         lb.textContent = !p.enabled ? t("c_off") : (p.link != "DOWN" ? p.link : t("c_down"));
     });
@@ -2958,7 +3071,8 @@ function dashStatus() {
         if (!r) return;
         var rt = S.rates[p.port - 1];
         r.cells[0].textContent = portLabel(p);
-        r.cells[1].innerHTML = linkBadge(p);
+        var pw = S.poe && S.poe[p.port];
+        r.cells[1].innerHTML = linkBadge(p) + (pw != null ? " " + badge("PoE " + pw.toFixed(1) + " W", "poe") : "");
         r.cells[2].textContent = rt ? fmtPps(rt.tx) : "-";
         r.cells[3].textContent = rt ? fmtPps(rt.rx) : "-";
         r.cells[4].textContent = BigInt(p.txB).toString();
@@ -4511,6 +4625,116 @@ tabHooks.lldp = {
     enter: lldpLoad
 };
 
+/* PoE: only on a switch with a PSE; the PoE type names follow POE_TYPE_* */
+var POE_TYPES = ["af", "at", "bt", "hipoe"],
+    POE_TYPE_TXT = ["AF 15.4 W", "AT 30 W", "BT 60 W", "HiPoE 90 W"];
+
+function poeSwitch(p) {
+    var sw = h("label", { class: "switch" }, [
+        h("input", {
+            type: "checkbox",
+            onchange: function() {
+                var box = this, on = box.checked;
+                function send() {
+                    postCmd("poe port " + p.port + (on ? " on" : " off")).then(function() {
+                        setTimeout(poeLoad, on ? 1500 : 300)
+                    }).catch(function() {
+                        box.checked = !on
+                    });
+                }
+                if (!on) return send();
+                box.checked = false;	// until confirmed
+                confirmModal(t("poe_ask", { p: p.port }), t("poe_ask_d"), function() {
+                    box.checked = true;
+                    send();
+                });
+            }
+        }), h("i")
+    ]);
+    sw.firstChild.checked = !!p.admin;
+    return sw;
+}
+
+function poeType(p, btPorts) {
+    var sel = h("select", {
+        class: "in",
+        onchange: function() {
+            var v = this.value;
+            postCmd("poe type " + p.port + " " + POE_TYPES[v]).then(function() {
+                setTimeout(poeLoad, 300)
+            }).catch(function() {
+                poeLoad()
+            });
+        }
+    });
+    POE_TYPES.forEach(function(n, i) {
+        var o = h("option", { value: i, text: POE_TYPE_TXT[i] });
+        if (i >= 2 && p.port > btPorts) {
+            o.disabled = true;
+            o.title = t("poe_bt_only", { n: btPorts });
+        }
+        sel.appendChild(o);
+    });
+    sel.value = p.type;
+    return sel;
+}
+
+function poeLoad() {
+    return getJSON("/poe.json").then(function(s) {
+        var tb = $("poetbl").tBodies[0], w = 0, mv = 0;
+        poeWatts(s);
+        updateStrip();
+        tb.innerHTML = "";
+        (s.ports || []).forEach(function(p) {
+            var tr = tb.insertRow(), pw = p.mv * p.ma / 1e6;
+            if (p.on) w += pw;
+            mv = p.mv;
+            tr.insertCell().textContent = p.port;
+            tr.insertCell().appendChild(poeSwitch(p));
+            tr.insertCell().innerHTML = p.on ? badge(t("poe_on"), "ok") : (p.admin ? badge(t("poe_det")) : badge(t("poe_off")));
+            tr.insertCell().appendChild(poeType(p, s.bt_ports));
+            tr.insertCell().textContent = p.on && p.class !== 255 ? p.class : "-";
+            tr.insertCell().textContent = p.on ? (p.mv / 1000).toFixed(1) + " V" : "-";
+            tr.insertCell().textContent = p.on ? p.ma + " mA" : "-";
+            tr.insertCell().textContent = p.on ? pw.toFixed(1) + " W" : "-";
+            var rb = h("button", {
+                class: "ctl",
+                text: t("poe_restart"),
+                onclick: function() {
+                    postCmd("poe restart " + p.port).then(function() {
+                        setTimeout(poeLoad, 1500)
+                    }).catch(function() {});
+                }
+            });
+            rb.disabled = !p.on;
+            tr.insertCell().appendChild(rb);
+        });
+        $("poesum").textContent = s.error ? t("poe_nochip", { chip: s.chip }) :
+            t("poe_sum", { chip: s.chip, v: (mv / 1000).toFixed(1), w: w.toFixed(1) });
+    });
+}
+var poePoller = new Poller(function() {
+    return poeLoad()
+}, 3000);
+tabHooks.poe = {
+    enter: function() {
+        poePoller.start()
+    },
+    leave: function() {
+        poePoller.stop()
+    }
+};
+$("poeAllOn").addEventListener("click", function() {
+    postCmd("poe global on").then(function() {
+        setTimeout(poeLoad, 1500)
+    }).catch(function() {});
+});
+$("poeAllOff").addEventListener("click", function() {
+    postCmd("poe global off").then(function() {
+        setTimeout(poeLoad, 300)
+    }).catch(function() {});
+});
+
 function eeeLoad() {
     return getJSON("/eee.json").then(function(s) {
         var tb = $("etable").tBodies[0];
@@ -5056,9 +5280,10 @@ var CONF_OVERWRITE = [
     /^lag\s+\d\b/, /^laghash\s+\d\b/, /^isolate\s+\d{1,2}\b/,
     /^stp\s+(prio|hello|maxage|fwd|txhold|version)\b/,
     /^stp\s+(port\s+\d{1,2}|lag\s+[1-4])\s+(edge|cost|prio|guard|filter|p2p)\b/,
+    /^poe\s+type\s+\d{1,2}\b/,
     /^igmp\b/, /^mtu\s+\d{1,2}\b/, /^storm\s+\d{1,2}\s+(bcast|mcast|ucast|umcast)\b/,
 ];
-var CONF_TOGGLE = [/^(syslog)\s+(on|off)$/, /^(ntp)\s+(on|off)$/, /^(stp)\s+(on|off)$/, /^(lldp)\s+(on|off)$/, /^(stp\s+(port\s+\d{1,2}|lag\s+[1-4]))\s+(on|off)$/];
+var CONF_TOGGLE = [/^(poe\s+port\s+\d{1,2})\s+(on|off)$/, /^(syslog)\s+(on|off)$/, /^(ntp)\s+(on|off)$/, /^(stp)\s+(on|off)$/, /^(lldp)\s+(on|off)$/, /^(stp\s+(port\s+\d{1,2}|lag\s+[1-4]))\s+(on|off)$/];
 
 function mergeConf(base, texts) {
     var conf = base.slice();
@@ -5089,6 +5314,11 @@ function mergeConf(base, texts) {
             }
             if ((m = line.match(/^lag (\d) lacp off$/))) {
                 drop(new RegExp("^lag " + m[1] + " lacp( |$)"));
+                return;
+            }
+            if ((m = line.match(/^poe global (on|off)$/))) {
+                drop(/^poe (port \d{1,2}|global) /);
+                conf.push(line);
                 return;
             }
             if (line === "mirror off") {
