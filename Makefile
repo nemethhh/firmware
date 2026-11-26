@@ -411,6 +411,7 @@ $(BUILDDIR)/%.rel: %.asm $(CCFLAGS_STAMP) | create_build_dir
 # Keep the reset vector first in HOME and append the machine descriptor last.
 $(BUILDDIR)/rtlplayground.ihx: $(STARTUP_OBJ) $(filter-out $(STARTUP_OBJ) $(MACHINE_OBJ),$(OBJS)) $(BUILDDIR)/crtbank.rel $(BUILDDIR)/crc16.rel $(BUILDDIR)/crypto/chacha_8051.rel $(MACHINE_OBJ)
 	$(CC) $(CC_FLAGS) $(MACHINE_CC_FLAGS) --xram-size 49151 -Wl-bHOME=0x00000 -Wl-bBANK1=0x14000 -Wl-bBANK2=0x24000 -Wl-bBANK3=0x34000 -Wl-bBANK4=0x44000 -Wl-r -o $@ $^
+	python3 tools/check_bank_calls.py $(BUILDDIR)
 
 $(BUILDDIR)/rtlplayground.img: $(BUILDDIR)/rtlplayground.ihx
 	objcopy --input-target=ihex -O binary $< $@
