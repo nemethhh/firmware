@@ -6,6 +6,7 @@
 
 #define POE_NONE	0x1000
 #define RTL8238C	0x8239
+#define HS104		0x0104
 
 #ifndef MACHINE_POE_CHIP
 #define MACHINE_POE_CHIP POE_NONE
@@ -13,6 +14,8 @@
 
 #if (MACHINE_POE_CHIP == RTL8238C)
 #include "rtl8238c.h"
+#elif (MACHINE_POE_CHIP == HS104)
+#include "hs104.h"
 #elif (MACHINE_POE_CHIP != POE_NONE)
 #error "Unsupported MACHINE_POE_CHIP"
 #endif

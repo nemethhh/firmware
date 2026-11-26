@@ -142,6 +142,7 @@ endif
 # Driver source list per controller. A value without an entry fails the build
 # rather than silently producing a firmware without PoE support.
 POE_CHIP_SRCS_RTL8238C := poe/rtl8238c.c
+POE_CHIP_SRCS_HS104 := poe/hs104.c
 POE_CHIP_SRCS := $(POE_CHIP_SRCS_$(MACHINE_POE_CHIP))
 ifeq ($(POE_CHIP_SRCS),)
 $(error MACHINE_POE_CHIP=$(MACHINE_POE_CHIP) has no driver in poe/)
