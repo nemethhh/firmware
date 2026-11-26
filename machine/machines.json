@@ -247,7 +247,7 @@
   {
     "machine": "REALHD_PSW8_25MG",
     "friendly_name": "RealHD PSW8-25MG",
-    "pcb": "PCB_AFGW_SWTG218ANS_V2_0_2_23308"
+    "pcb": "PCB_AFGW_SWTG218ANS_V2_0_2_23308__POE"
   },
   {
     "machine": "RUIYING_RY_4GT_2SX",

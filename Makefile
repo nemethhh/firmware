@@ -69,9 +69,12 @@ else
 	MACHINE_SRC =
 endif
 
+H := \#
 MACHINE_INIT_DEFAULT := machine/default_machine_init.c
 ifneq ($(strip $(MACHINE_SRC)),)
-MACHINE_HAS_CUSTOM_INIT := $(shell grep -q 'MACHINE_CUSTOM_INIT' $(MACHINE_SRC) 2>/dev/null && echo yes)
+# A PCB source may #include a base PCB source that holds the hook.
+MACHINE_PCB_INCLUDES := $(addprefix $(dir $(MACHINE_SRC)),$(shell sed -n 's/^$Hinclude "\(.*\.c\)"/\1/p' $(MACHINE_SRC) 2>/dev/null))
+MACHINE_HAS_CUSTOM_INIT := $(shell grep -q 'MACHINE_CUSTOM_INIT' $(MACHINE_SRC) $(MACHINE_PCB_INCLUDES) 2>/dev/null && echo yes)
 ifeq ($(MACHINE_HAS_CUSTOM_INIT),)
 	MACHINE_INIT_SRC := $(MACHINE_INIT_DEFAULT)
 endif
@@ -79,7 +82,6 @@ endif
 
 # PCB information
 ifneq ($(strip $(MACHINE_SRC)),)
-H := \#
 MACHINE_CHIPSET := $(shell sed -n 's/^$Hdefine MACHINE_CHIPSET //p' $(MACHINE_SRC) 2>/dev/null | head -n 1)
 else
 MACHINE_CHIPSET =
@@ -118,16 +120,24 @@ ifneq ($(NO_POE),)
 endif
 POE_SRCS := poe/poe.c
 
-MACHINE_POE_CHIP := $(shell \
-	grep -hE '^[[:space:]]*#[[:space:]]*define[[:space:]]+MACHINE_POE_CHIP([[:space:]]|$$)' \
-		machine/$(MACHINE).h 2>/dev/null | head -n 1 | sed -n 's/^.*MACHINE_POE_CHIP[[:space:]]//p' )
+# The PCB source selects the PoE controller with "#define MACHINE_POE_CHIP <chip>".
+ifneq ($(strip $(MACHINE_SRC)),)
+MACHINE_POE_CHIP := $(shell sed -n 's/^$Hdefine MACHINE_POE_CHIP[[:space:]]\{1,\}\([A-Za-z0-9_]*\).*/\1/p' $(MACHINE_SRC) 2>/dev/null | head -n 1)
+endif
+ifneq ($(MACHINE_POE_CHIP),)
+	MACHINE_CC_FLAGS += -DMACHINE_POE_CHIP=$(MACHINE_POE_CHIP)
+endif
 
 POE_FW_DIR := poe/firmware
+# Controllers that need a PSE image extracted from the stock firmware.
+POE_FW_CHIPS := RTL8238C
 ifneq ($(MACHINE_POE_CHIP),)
 ifndef NO_POE
+ifneq ($(filter $(MACHINE_POE_CHIP),$(POE_FW_CHIPS)),)
 POE_ENABLED := 1
 POE_STOCK_FW := stock_fw/$(MACHINE).bin
 POE_FW_SRC := $(POE_FW_DIR)/poe_fw_$(MACHINE_POE_CHIP)_$(MACHINE).c
+endif
 
 # Driver source list per controller. A value without an entry fails the build
 # rather than silently producing a firmware without PoE support.
